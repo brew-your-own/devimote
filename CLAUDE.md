@@ -98,6 +98,10 @@ but the connection proceeds (auto-discovered IP wins).
 
 ---
 
+## Workflow
+
+- **Do not commit unless explicitly asked.** Make changes, then wait for the user to say "commit".
+
 ## Style and conventions
 
 - **No comments** unless the why is non-obvious (e.g. the 4× retry in `_send_command`,
