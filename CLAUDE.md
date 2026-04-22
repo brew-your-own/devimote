@@ -2,7 +2,7 @@
 
 ## What this project is
 
-An unofficial remote control for the Devialet Expert (D200, non-Pro) amplifier, written in
+An unofficial remote control for the Devialet Expert (non-Pro, i.e. before the Core Infinity board) amplifier, written in
 Python. The amplifier communicates over UDP on the local network; no official API exists —
 the protocol was reverse-engineered via Wireshark.
 
@@ -92,7 +92,7 @@ Run linting: `uv run pylint src/backend.py src/cli.py`
 DEVIALET_IP=mydevialet-amp.home.arpa   # hostname or IP; optional, auto-discovered if unset
 ```
 
-`DEVIALET_IP` accepts both hostnames (resolved via DNS) and raw IPs.
+`DEVIALET_IP` accepts a hostname or an IP.
 If set and the discovered device IP doesn't match, a warning is printed to stderr
 but the connection proceeds (auto-discovered IP wins).
 
