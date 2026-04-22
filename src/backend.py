@@ -5,24 +5,15 @@
 
 '''Backend communication module for Devialet Expert amplifiers'''
 
+import binascii
 import socket
 import struct
 import math as m
 
 
-def _crc16(data : bytearray):
-    '''Internal function to calculate a CRC-16/CCITT-FALSE from the given bytearray'''
-    if data is None :
-        return 0
-    crc = 0xFFFF
-    for i in enumerate(data):
-        crc ^= data[i[0]] << 8
-        for _ in range(8):
-            if (crc & 0x8000) > 0:
-                crc =(crc << 1) ^ 0x1021
-            else:
-                crc = crc << 1
-    return crc & 0xFFFF
+def _crc16(data: bytearray) -> int:
+    '''CRC-16/CCITT-FALSE checksum'''
+    return binascii.crc_hqx(data, 0xFFFF)
 
 
 class DeviMoteBackEnd():
