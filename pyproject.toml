@@ -12,17 +12,19 @@ dependencies = [
 ]
 
 [project.scripts]
-devialet = "cli:main"
+devialet     = "cli:main"
+devialet-gui = "devimote:main"
 
 [dependency-groups]
 dev = ["pylint"]
+gui = ["kivy"]
 
 [build-system]
 requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-py-modules = ["cli", "backend"]
+py-modules = ["cli", "backend", "devimote"]
 
 [tool.setuptools.package-dir]
 "" = "src"

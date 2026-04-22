@@ -132,5 +132,9 @@ class DeviMoteApp(App):
                 f"{'[M]' if self.status['muted'] else ''}"
             )
 
-if __name__ == '__main__':
+def main():
+    '''Entry point for the GUI'''
     DeviMoteApp().run()
+
+if __name__ == '__main__':
+    main()
