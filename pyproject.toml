@@ -17,7 +17,7 @@ devialet-gui = "devimote:main"
 
 [dependency-groups]
 dev = ["pylint"]
-gui = ["kivy"]
+gui = ["kivy[base]"]
 
 [build-system]
 requires = ["setuptools>=64"]
