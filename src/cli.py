@@ -22,13 +22,18 @@ def _volume_db(raw: int) -> float:
 def _connect() -> DeviMoteBackEnd:
     backend = DeviMoteBackEnd()
     expected_ip = os.getenv('DEVIALET_IP')
-    status = backend.update()
-    if not status['connected']:
-        raise click.ClickException('Amplifier not found (timeout waiting for UDP broadcast on port 45454)')
+    s = backend.update()
+    if not s['connected']:
+        raise click.ClickException(
+            'Amplifier not found (timeout waiting for UDP broadcast on port 45454)'
+        )
     if expected_ip:
         resolved = socket.gethostbyname(expected_ip)
-        if status['ip'] != resolved:
-            click.echo(f"Warning: expected {expected_ip} ({resolved}), connected to {status['ip']}", err=True)
+        if s['ip'] != resolved:
+            click.echo(
+                f"Warning: expected {expected_ip} ({resolved}), connected to {s['ip']}",
+                err=True,
+            )
     return backend
 
 

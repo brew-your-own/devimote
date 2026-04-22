@@ -59,7 +59,7 @@ class DeviMoteBackEnd():
             self.packet_cnt += 1
             crc = _crc16(data[0:12])
             data[12] = (crc & 0xff00) >> 8
-            data[13] = (crc & 0x00ff)
+            data[13] = crc & 0x00ff
             sock.sendto(data, (self.status['ip'], self.UDP_PORT_CMD))
 
     def toggle_power(self):
@@ -79,8 +79,7 @@ class DeviMoteBackEnd():
     def set_volume(self, db_value):
         '''Function for changing the volume'''
 
-        if db_value > self.VOLUME_LIMIT:
-            db_value = self.VOLUME_LIMIT
+        db_value = min(db_value, self.VOLUME_LIMIT)
 
         def _db_convert(db_value):
             '''Internal function to convert dB to a 16-bit representation used by set_volume'''
@@ -102,7 +101,7 @@ class DeviMoteBackEnd():
         data[6] = 0x00
         data[7] = 0x04
         data[8] = (volume & 0xff00) >> 8
-        data[9] = (volume & 0x00ff)
+        data[9] = volume & 0x00ff
         self._send_command(data)
 
     def set_output(self, output):
@@ -115,7 +114,7 @@ class DeviMoteBackEnd():
         if output > 7:
             data[9] = (out_val & 0x00ff) >> 1
         else:
-            data[9] = (out_val & 0x00ff)
+            data[9] = out_val & 0x00ff
         self._send_command(data)
 
     def update(self):
@@ -141,6 +140,6 @@ class DeviMoteBackEnd():
         self.status['muted']   = (data[308] & 0x2) != 0
         self.status['channel'] = (data[308] & 0x3c) >> 2
         self.status['volume']  =  data[310]
-        self.status['crc_ok']  = (_crc16(data[:-2]) == struct.unpack('>H',data[-2:])[0])
+        self.status['crc_ok']  = _crc16(data[:-2]) == struct.unpack('>H',data[-2:])[0]
 
         return self.status

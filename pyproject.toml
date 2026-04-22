@@ -14,6 +14,9 @@ dependencies = [
 [project.scripts]
 devialet = "cli:main"
 
+[dependency-groups]
+dev = ["pylint"]
+
 [build-system]
 requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
