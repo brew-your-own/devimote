@@ -1,0 +1,20 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Devialet Expert",
+        "description": "Enter the IP address or hostname of your Devialet Expert amplifier.",
+        "data": {
+          "host": "Host (IP address or hostname)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to the amplifier. Check the IP/hostname and ensure the amplifier is on the network.",
+      "invalid_response": "The amplifier responded but with an invalid checksum. Check your network."
+    },
+    "abort": {
+      "already_configured": "This amplifier is already configured."
+    }
+  }
+}

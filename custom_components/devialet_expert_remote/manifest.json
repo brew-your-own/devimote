@@ -1,0 +1,12 @@
+{
+  "domain": "devialet_expert_remote",
+  "name": "Devialet Expert (non Pro) Remote",
+  "version": "0.1.0",
+  "config_flow": true,
+  "iot_class": "local_polling",
+  "integration_type": "device",
+  "requirements": [],
+  "codeowners": ["@brew_your_own"],
+  "documentation": "https://github.com/brew-your-own/devimote",
+  "issue_tracker": "https://github.com/brew-your-own/devimote/issues"
+}
