@@ -6,10 +6,11 @@ An unofficial remote control for the Devialet Expert (non-Pro, i.e. before the C
 Python. The amplifier communicates over UDP on the local network; no official API exists —
 the protocol was reverse-engineered via Wireshark.
 
-Two interfaces are provided:
+Three interfaces are provided:
 
 - **CLI** (`devialet`): status display and control via subcommands, no GUI dependency.
 - **Kivy GUI** (`devialet-gui`): original graphical interface.
+- **Home Assistant custom component** (`custom_components/devialet_expert_remote`): MediaPlayer entity with volume, mute, power, and source selection. Minimum HA 2024.4.0.
 
 ---
 
@@ -21,12 +22,23 @@ src/
   cli.py        Click-based CLI entry point.
   devimote.py   Kivy GUI app. Imports DeviMoteBackEnd from backend.py.
   devimote.kv   Kivy declarative layout.
+custom_components/devialet_expert_remote/
+  __init__.py   Integration setup/teardown (async_setup_entry, async_unload_entry).
+  coordinator.py  DataUpdateCoordinator: polls amp every 30 s, notifies entities.
+  config_flow.py  ConfigFlow: "Add Integration" UI in HA Settings.
+  media_player.py MediaPlayerEntity: volume, mute, power, source selection.
+  backend.py    Canonical backend. src/backend.py is a symlink to this file.
+  const.py      Domain, update interval, volume range constants.
+  manifest.json HA integration metadata.
+  strings.json  UI strings (English).
 wireshark/
   dec.lua       Wireshark dissector for DEC protocol.
   des.lua       Wireshark dissector for DES protocol.
 pyproject.toml  Project metadata, dependencies, entry points.
 .python-version Pins the project to Python 3.12 (kivy requires it).
 .env.example    Documents supported environment variables.
+deploy-ha-dev.sh  Deploys custom_components/ to HA via rsync over SSH.
+hacs.json       HACS distribution metadata.
 ```
 
 ---
@@ -72,6 +84,34 @@ Volume display conversion (from the raw status byte): `db = (raw - 195) / 2.0`
 matches by case-insensitive substring and errors on 0 or >1 matches.
 `set_output(index)` sends the command.
 
+`ch_list` is rebuilt from scratch on every `update()` call (not accumulated) so it
+always reflects the amp's current configuration.
+
+---
+
+## Home Assistant integration
+
+### Architecture
+
+| File | HA concept | Role |
+|------|-----------|------|
+| `__init__.py` | `ConfigEntry` / `async_setup_entry` | Creates coordinator, forwards to platforms |
+| `coordinator.py` | `DataUpdateCoordinator` | Polls amp every 30 s via executor; command helpers also run via executor |
+| `config_flow.py` | `ConfigFlow` | Validates host at setup time; prevents duplicate entries via unique ID |
+| `media_player.py` | `CoordinatorEntity` + `MediaPlayerEntity` | Exposes state and controls; reads live data from coordinator |
+
+### Volume handling
+
+HA sends `volume_level` as a 0.0–1.0 float. The entity converts to dB
+(`db = volume * 87.5 - 97.5`), then `set_volume()` rounds to the nearest 0.5 dB
+before encoding — the hardware only supports 0.5 dB steps and `_db_convert`
+crashes on non-multiples.
+
+### backend.py
+
+`custom_components/devialet_expert_remote/backend.py` is the canonical copy.
+`src/backend.py` is a symlink to it. Edit only the custom_components version.
+
 ---
 
 ## Dependency groups (uv)
@@ -90,11 +130,15 @@ Run linting: `uv run pylint src/backend.py src/cli.py`
 
 ```
 DEVIALET_IP=mydevialet-amp.home.arpa   # hostname or IP; optional, auto-discovered if unset
+HA_SSH_TARGET=user@homeassistant.local # SSH target used by deploy-ha-dev.sh
 ```
 
 `DEVIALET_IP` accepts a hostname or an IP.
 If set and the discovered device IP doesn't match, a warning is printed to stderr
 but the connection proceeds (auto-discovered IP wins).
+
+`HA_SSH_TARGET` is only used by `deploy-ha-dev.sh` to rsync the custom component
+to the HA host.
 
 ---
 

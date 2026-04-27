@@ -73,7 +73,7 @@ class DeviMoteBackEnd():
         '''Function for changing the volume'''
 
         db_value = min(db_value, self.VOLUME_LIMIT)
-        # Hardware resolution is 0.5 dB; _db_convert recurses in 0.5 steps and crashes on non-multiples.
+        # Hardware resolution is 0.5 dB; _db_convert crashes on non-multiples.
         db_value = round(db_value * 2) / 2
 
         def _db_convert(db_value):
