@@ -16,6 +16,8 @@ A custom component is provided in `custom_components/devialet_expert_remote/`.
 It exposes the amplifier as a **Media Player** entity with volume, mute, power,
 and source selection.
 
+![Home Assistant integration](doc/images/ha-integration.png)
+
 ### Network requirements
 
 The amp broadcasts UDP status packets on port 45454. Home Assistant must be able
