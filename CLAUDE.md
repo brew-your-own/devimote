@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2026 Renaud Bruyeron <bruyeron@gmail.com>
+
+SPDX-License-Identifier: CC0-1.0
+-->
+
 # DeviMote — project notes for Claude
 
 ## What this project is
