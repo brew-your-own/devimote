@@ -7,8 +7,8 @@ SPDX-License-Identifier: CC0-1.0
 # DeviMote
 Unofficial remote control for Devialet Expert (non-Pro) amplifiers written in Python
 
-![Pylint](https://github.com/gnulabis/devimote/workflows/Pylint/badge.svg?branch=main)
-![REUSE](https://github.com/gnulabis/devimote/workflows/REUSE/badge.svg?branch=main)
+![Pylint](https://github.com/brew-your-own/devimote/workflows/Pylint/badge.svg?branch=main)
+![REUSE](https://github.com/brew-your-own/devimote/workflows/REUSE/badge.svg?branch=main)
 
 ## Home Assistant
 
