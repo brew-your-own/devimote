@@ -6,6 +6,9 @@ name: Pylint
 
 on: [push, workflow_dispatch]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
 
@@ -24,7 +27,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install uv
-        uv sync --group dev
+        uv sync --group dev --group gui
     - name: Analysing the code with pylint
       run: |
         uv run pylint $(git ls-files '*.py' | grep -v 'src/backend\.py')
