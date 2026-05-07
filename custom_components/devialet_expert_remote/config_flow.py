@@ -8,9 +8,10 @@ from __future__ import annotations
 
 from typing import Any
 
+# pylint: disable=import-error
 import voluptuous as vol
-
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+# pylint: enable=import-error
 
 from .backend import DeviMoteBackEnd
 from .const import CONF_HOST, DOMAIN
@@ -21,7 +22,7 @@ STEP_USER_DATA_SCHEMA = vol.Schema({
 
 
 # ConfigFlow drives the "Add Integration" UI shown in Settings → Integrations.
-class DevialetConfigFlow(ConfigFlow, domain=DOMAIN):
+class DevialetConfigFlow(ConfigFlow, domain=DOMAIN):  # pylint: disable=too-few-public-methods
     """Handle the initial configuration UI."""
 
     VERSION = 1  # Incremented when the stored data schema changes; triggers HA migration hooks.
@@ -29,6 +30,7 @@ class DevialetConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
+        """Handle the user setup step."""
         errors: dict[str, str] = {}
 
         if user_input is not None:
@@ -37,7 +39,7 @@ class DevialetConfigFlow(ConfigFlow, domain=DOMAIN):
                 status = await self.hass.async_add_executor_job(
                     _try_connect, host
                 )
-            except Exception:  # noqa: BLE001
+            except Exception:  # noqa: BLE001  # pylint: disable=broad-exception-caught
                 errors["base"] = "cannot_connect"
             else:
                 if not status.get("connected"):

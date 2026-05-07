@@ -122,7 +122,11 @@ crashes on non-multiples.
 | `dev` | `uv sync --group dev` | `pylint` for linting |
 | `gui` | `uv sync --group gui` | `kivy[base]` for the Kivy GUI |
 
-Run linting: `uv run pylint src/backend.py src/cli.py`
+Run linting: `uv run pylint $(git ls-files '*.py' | grep -v 'src/backend\.py')`
+
+`src/backend.py` is excluded because it is a symlink to the canonical
+`custom_components/devialet_expert_remote/backend.py`; passing both would cause a
+false R0801 duplicate-code warning.
 
 ---
 
@@ -150,9 +154,10 @@ to the HA host.
 
 - **No comments** unless the why is non-obvious (e.g. the 4× retry in `_send_command`,
   the magic byte offsets in `update()`).
-- Pylint score must stay at **10.00/10** across `backend.py` and `cli.py`.
-  `devimote.py` has a `# pylint: disable=import-error` on the backend import
-  because Kivy is not installed in the default (non-gui) venv.
+- Pylint score must stay at **10.00/10** across all tracked `.py` files (excluding the
+  `src/backend.py` symlink). HA component files use `# pylint: disable/enable=import-error`
+  blocks around HA imports (unavailable outside HA). `devimote.py` does the same for
+  Kivy imports. `max-line-length = 120` is set in `pyproject.toml` (HA convention).
 - SPDX licence headers on all source files (GPL-3.0-or-later for Python, CC0-1.0 for
   config/CI files). REUSE compliance is checked by CI.
 - Python 3.12 is pinned via `.python-version`. Kivy 2.3.1 does not ship a compiled

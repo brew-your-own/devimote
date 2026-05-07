@@ -4,13 +4,13 @@
 
 '''An unofficial remote control application for Devialet Expert amplifiers'''
 
-from backend import DeviMoteBackEnd  # pylint: disable=import-error
-
 from kivy.app import App
 from kivy.properties import ObjectProperty # pylint: disable=no-name-in-module
 from kivy.clock import Clock
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
+
+from backend import DeviMoteBackEnd  # pylint: disable=import-error
 
 class DeviMoteVolume(BoxLayout):
     '''Wrapper class around BoxLayout'''

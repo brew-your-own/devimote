@@ -28,3 +28,6 @@ py-modules = ["cli", "backend", "devimote"]
 
 [tool.setuptools.package-dir]
 "" = "src"
+
+[tool.pylint.format]
+max-line-length = 120

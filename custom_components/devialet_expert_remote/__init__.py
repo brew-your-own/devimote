@@ -4,8 +4,10 @@
 
 """Devialet Expert (non-Pro) Remote integration for Home Assistant."""
 
+# pylint: disable=import-error
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+# pylint: enable=import-error
 
 from .const import CONF_HOST, DOMAIN
 from .coordinator import DevialetCoordinator

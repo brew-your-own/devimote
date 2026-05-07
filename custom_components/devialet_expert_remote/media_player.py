@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+# pylint: disable=import-error
 from homeassistant.components.media_player import (
     MediaPlayerEntity,
     MediaPlayerEntityFeature,
@@ -16,6 +17,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+# pylint: enable=import-error
 
 from .const import (
     CONF_HOST,
@@ -63,6 +65,7 @@ class DevialetMediaPlayer(CoordinatorEntity, MediaPlayerEntity):
 
     @property
     def device_info(self) -> DeviceInfo:
+        """Return device registry information."""
         # DeviceInfo links this entity to a device in the HA device registry.
         data = self.coordinator.data or {}
         return DeviceInfo(
@@ -75,6 +78,7 @@ class DevialetMediaPlayer(CoordinatorEntity, MediaPlayerEntity):
 
     @property
     def available(self) -> bool:
+        """Return True when the last poll succeeded and the amp responded."""
         # last_update_success is False if the last _async_update_data raised UpdateFailed.
         return (
             self.coordinator.last_update_success
@@ -83,6 +87,7 @@ class DevialetMediaPlayer(CoordinatorEntity, MediaPlayerEntity):
 
     @property
     def state(self) -> MediaPlayerState | None:
+        """Return the current power state."""
         if not self.available:
             return None
         power = (self.coordinator.data or {}).get("power", False)
@@ -90,6 +95,7 @@ class DevialetMediaPlayer(CoordinatorEntity, MediaPlayerEntity):
 
     @property
     def volume_level(self) -> float | None:
+        """Return volume as a 0.0–1.0 float."""
         raw = (self.coordinator.data or {}).get("volume")
         if raw is None:
             return None
@@ -99,10 +105,12 @@ class DevialetMediaPlayer(CoordinatorEntity, MediaPlayerEntity):
 
     @property
     def is_volume_muted(self) -> bool | None:
+        """Return mute state."""
         return (self.coordinator.data or {}).get("muted")
 
     @property
     def source(self) -> str | None:
+        """Return the active source name."""
         data = self.coordinator.data or {}
         ch = data.get("channel")
         ch_list = data.get("ch_list", {})
@@ -112,34 +120,40 @@ class DevialetMediaPlayer(CoordinatorEntity, MediaPlayerEntity):
 
     @property
     def source_list(self) -> list[str]:
+        """Return list of available source names."""
         ch_list = (self.coordinator.data or {}).get("ch_list", {})
         return [name.strip() for name in ch_list.values()]
 
     async def async_set_volume_level(self, volume: float) -> None:
+        """Set volume from HA 0.0–1.0 float."""
         db = volume * VOLUME_DB_RANGE + VOLUME_DB_MIN
         await self.coordinator.async_set_volume(db)
         # Triggers an immediate re-poll so HA reflects the new state without waiting for the next interval.
         await self.coordinator.async_request_refresh()
 
     async def async_mute_volume(self, mute: bool) -> None:
+        """Mute or unmute if state differs."""
         if mute != (self.coordinator.data or {}).get("muted", False):
             await self.coordinator.async_toggle_mute()
             # Triggers an immediate re-poll so HA reflects the new state without waiting for the next interval.
             await self.coordinator.async_request_refresh()
 
     async def async_turn_on(self) -> None:
+        """Turn on if not already on."""
         if not (self.coordinator.data or {}).get("power", False):
             await self.coordinator.async_toggle_power()
             # Triggers an immediate re-poll so HA reflects the new state without waiting for the next interval.
             await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self) -> None:
+        """Turn off if not already off."""
         if (self.coordinator.data or {}).get("power", False):
             await self.coordinator.async_toggle_power()
             # Triggers an immediate re-poll so HA reflects the new state without waiting for the next interval.
             await self.coordinator.async_request_refresh()
 
     async def async_select_source(self, source: str) -> None:
+        """Select source by name."""
         ch_list = (self.coordinator.data or {}).get("ch_list", {})
         for idx, name in ch_list.items():
             if name.strip() == source:
