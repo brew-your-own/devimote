@@ -11,4 +11,17 @@ Unreleased
 
 Added
 -----
-- First version
+- ``pydevialet_expert_nonpro``: the UDP communication code is now an installable,
+  dependency-free Python library (PyPI distribution ``pydevialet-expert-nonpro``) that any
+  application can reuse. Public API: ``DeviMoteBackEnd`` (alias ``DevialetExpertNonPro``).
+- Unit tests covering the CRC-16/CCITT-FALSE checksum (incl. the canonical ``0x29B1`` check
+  value), the dB volume encoding, and status-packet decoding — no amplifier required.
+
+Changed
+-------
+- Replaced the hand-rolled CRC-16/CCITT-FALSE with ``binascii.crc_hqx`` from the standard
+  library (verified equivalent via the test vectors above).
+- The Kivy GUI now lives in ``gui/devimote.py`` and imports the backend from the library
+  instead of embedding it; it is a standalone script, not part of the published package.
+- Project now builds with a ``pyproject.toml`` (setuptools, src layout). The GUI is
+  available via the ``gui`` extra.

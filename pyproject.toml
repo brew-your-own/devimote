@@ -1,0 +1,45 @@
+# SPDX-FileCopyrightText: 2020 Dimitris Lampridis <dlampridis@gmail.com>
+# SPDX-FileCopyrightText: 2026 Renaud Bruyeron <bruyeron@gmail.com>
+#
+# SPDX-License-Identifier: CC0-1.0
+
+[project]
+name = "pydevialet-expert-nonpro"
+version = "0.1.0"
+description = "Unofficial library for controlling Devialet Expert (non-Pro, pre-Core-Infinity) amplifiers over UDP"
+requires-python = ">=3.9"
+license = "GPL-3.0-or-later"
+authors = [
+    { name = "Dimitris Lampridis" },
+    { name = "Renaud Bruyeron", email = "bruyeron@gmail.com" },
+]
+readme = "README.md"
+keywords = ["devialet", "expert", "amplifier", "remote", "udp", "home-assistant"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Home Automation",
+    "Topic :: Multimedia :: Sound/Audio",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/gnulabis/devimote"
+Issues = "https://github.com/gnulabis/devimote/issues"
+
+[project.optional-dependencies]
+dev = ["pylint", "pytest"]
+gui = ["kivy[base]>=2.3.1"]
+
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pylint.format]
+max-line-length = 120
