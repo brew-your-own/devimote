@@ -59,6 +59,9 @@ python gui/devimote.py
 
 ![](doc/images/devimote_demo.gif)
 
+> [!NOTE]  
+> the Kivy 2.3.1 dependency [does not install with Python 3.14](https://github.com/kivy/kivy/issues/9225). If you want to test/use the GUI, you must use Python 3.13 or earlier.
+
 ## Development
 
 ```bash
