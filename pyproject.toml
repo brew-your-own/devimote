@@ -10,7 +10,7 @@ description = "Unofficial library for controlling Devialet Expert (non-Pro, pre-
 requires-python = ">=3.9"
 license = "GPL-3.0-or-later"
 authors = [
-    { name = "Dimitris Lampridis" },
+    { name = "Dimitris Lampridis", email = "dlampridis@gmail.com" },
     { name = "Renaud Bruyeron", email = "bruyeron@gmail.com" },
 ]
 readme = "README.md"
