@@ -15,12 +15,14 @@ The amplifier is controlled over UDP on the local network. There is no official 
 the protocol was reverse-engineered with Wireshark. "Non-Pro" means hardware from before
 the Core Infinity board.
 
-This repository provides three things:
+This repository provides four things:
 
 - **`pydevialet_expert_nonpro`** — a small, dependency-free Python library implementing the
   UDP protocol. This is the publishable artifact, installable from PyPI and reusable by any
   application (CLIs, GUIs, Home Assistant, …).
 - **A CLI** (`devialet`) — a command-line remote, installed as an optional extra.
+- **A Home Assistant custom component** (`custom_components/devialet_expert_remote`) — a
+  `media_player` entity installable via HACS.
 - **A Kivy GUI** (`gui/devimote.py`) — the original graphical remote, now a thin consumer of
   the library. It is a standalone script and is *not* part of the published package.
 
@@ -87,6 +89,29 @@ devialet volume -- -20.5   # use -- before negative values
 devialet mute
 devialet power
 devialet source analog
+```
+
+## Home Assistant
+
+The custom component exposes the amplifier as a `media_player` entity with volume, mute,
+power, and source selection. It is installable via [HACS](https://www.hacs.xyz) or manually.
+
+**Via HACS** — add this repository as a custom repository, then install
+"Devialet Expert (non-Pro) Remote".
+
+**Manually** — copy `custom_components/devialet_expert_remote/` into your HA
+`config/custom_components/` directory and restart Home Assistant.
+
+Then go to Settings → Integrations → Add Integration → search for "Devialet".
+
+The component polls the amplifier every 30 seconds and also refreshes immediately after any
+command (volume, mute, power, source).
+
+For development, deploy directly to a local HA instance over SSH:
+
+```bash
+cp .env.example .env   # set HA_SSH_TARGET=homeassistant@<your-ha-host>
+./deploy-ha-dev.sh
 ```
 
 ## GUI
