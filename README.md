@@ -15,11 +15,12 @@ The amplifier is controlled over UDP on the local network. There is no official 
 the protocol was reverse-engineered with Wireshark. "Non-Pro" means hardware from before
 the Core Infinity board.
 
-This repository provides two things:
+This repository provides three things:
 
 - **`pydevialet_expert_nonpro`** — a small, dependency-free Python library implementing the
   UDP protocol. This is the publishable artifact, installable from PyPI and reusable by any
   application (CLIs, GUIs, Home Assistant, …).
+- **A CLI** (`devialet`) — a command-line remote, installed as an optional extra.
 - **A Kivy GUI** (`gui/devimote.py`) — the original graphical remote, now a thin consumer of
   the library. It is a standalone script and is *not* part of the published package.
 
@@ -48,6 +49,46 @@ of `DeviMoteBackEnd`.
 
 All calls are blocking; run them on a worker thread if you need async behaviour.
 
+## CLI
+
+Install the `cli` extra to get the `devialet` command:
+
+```bash
+pip install "pydevialet-expert-nonpro[cli]"
+```
+
+Or run without installing via `uv`:
+
+```bash
+uvx --from "pydevialet-expert-nonpro[cli]" devialet --help
+```
+
+```
+Usage: devialet [OPTIONS] COMMAND [ARGS]...
+
+Commands:
+  status  Show current amplifier status
+  volume  Set volume in dB
+  mute    Toggle mute on/off
+  power   Toggle power (on/standby)
+  source  Select input source by name (case-insensitive partial match)
+```
+
+The CLI auto-discovers the amplifier by listening for its UDP broadcast. You can optionally
+pin it to a specific device by setting `DEVIALET_IP` in a `.env` file (copy `.env.example`):
+
+```bash
+cp .env.example .env   # then edit DEVIALET_IP=<your-amp-ip>
+```
+
+```bash
+devialet status
+devialet volume -- -20.5   # use -- before negative values
+devialet mute
+devialet power
+devialet source analog
+```
+
 ## GUI
 
 The Kivy GUI is a standalone script. Install the project with the `gui` extra and run it:
@@ -65,7 +106,7 @@ python gui/devimote.py
 ## Development
 
 ```bash
-pip install -e ".[dev,gui]"
+pip install -e ".[dev,cli,gui]"
 pytest                                         # unit tests (no amplifier needed)
 pylint src/pydevialet_expert_nonpro tests gui  # must stay at 10.00/10
 reuse lint                                     # licensing compliance

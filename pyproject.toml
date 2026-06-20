@@ -32,7 +32,11 @@ Issues = "https://github.com/gnulabis/devimote/issues"
 
 [project.optional-dependencies]
 dev = ["pylint", "pytest"]
+cli = ["click", "python-dotenv"]
 gui = ["kivy[base]>=2.3.1"]
+
+[project.scripts]
+devialet = "pydevialet_expert_nonpro.cli:main"
 
 [build-system]
 requires = ["setuptools>=64"]
