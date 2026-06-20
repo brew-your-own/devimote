@@ -96,6 +96,17 @@ devialet source analog
 The custom component exposes the amplifier as a `media_player` entity with volume, mute,
 power, and source selection. It is installable via [HACS](https://www.hacs.xyz) or manually.
 
+![Home Assistant integration](doc/images/ha-integration.png)
+
+### Network requirements
+
+The amp broadcasts UDP status packets on port 45454. Home Assistant must be able to receive
+these broadcasts. If HA is on a different subnet, configure a **UDP broadcast relay** on your
+router/firewall to forward port 45454 broadcasts to the HA host. Port 45455 (commands) must
+be reachable from HA to the amp — a standard firewall allow rule is sufficient.
+
+### Installation
+
 **Via HACS** — add this repository as a custom repository, then install
 "Devialet Expert (non-Pro) Remote".
 
