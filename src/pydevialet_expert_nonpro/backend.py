@@ -69,7 +69,7 @@ class DeviMoteBackEnd:
         for _ in range(4):
             data[3] = self.packet_cnt
             data[5] = self.packet_cnt >> 1
-            self.packet_cnt += 1
+            self.packet_cnt = (self.packet_cnt + 1) % 256
             crc = _crc16(data[0:12])
             data[12] = (crc & 0xff00) >> 8
             data[13] = crc & 0x00ff

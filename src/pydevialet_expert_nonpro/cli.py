@@ -4,8 +4,11 @@
 
 '''CLI remote control for Devialet Expert amplifiers'''
 
+import contextlib
+import json
 import os
 import socket
+from pathlib import Path
 
 import click
 from dotenv import load_dotenv
@@ -17,6 +20,29 @@ load_dotenv()
 
 def _volume_db(raw: int) -> float:
     return (raw - 195) / 2.0
+
+
+def _state_path() -> Path:
+    return Path(click.get_app_dir('pydevialet-expert-nonpro')) / 'state.json'
+
+
+def _load_packet_cnt(ip: str) -> int:
+    try:
+        state = json.loads(_state_path().read_text())
+    except (FileNotFoundError, json.JSONDecodeError):
+        return 0
+    return state.get(ip, 0)
+
+
+def _save_packet_cnt(ip: str, packet_cnt: int) -> None:
+    path = _state_path()
+    try:
+        state = json.loads(path.read_text())
+    except (FileNotFoundError, json.JSONDecodeError):
+        state = {}
+    state[ip] = packet_cnt
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(state))
 
 
 def _connect() -> DeviMoteBackEnd:
@@ -34,7 +60,24 @@ def _connect() -> DeviMoteBackEnd:
                 f"Warning: expected {expected_ip} ({resolved}), connected to {s['ip']}",
                 err=True,
             )
+    backend.packet_cnt = _load_packet_cnt(s['ip'])
     return backend
+
+
+@contextlib.contextmanager
+def _session():
+    '''Connect and persist the packet counter afterwards.
+
+    The amplifier tracks the command sequence counter across invocations; since each
+    CLI run creates a fresh backend, a command sent shortly after a previous run gets
+    the same counter values again and is treated as a stale duplicate (this is why
+    source selection could silently fail / leave the amp in a bad state).
+    '''
+    backend = _connect()
+    try:
+        yield backend
+    finally:
+        _save_packet_cnt(backend.status['ip'], backend.packet_cnt)
 
 
 @click.group()
@@ -56,6 +99,7 @@ def status():
     click.echo(f"Muted:   {'Yes' if s['muted'] else 'No'}")
     click.echo(f"Source:  {ch_name} ({s['channel']})")
     click.echo(f"Sources: {sources}")
+    click.echo(f"State:   {_state_path()} (packet_cnt={backend.packet_cnt})")
 
 
 @main.command()
@@ -66,24 +110,24 @@ def volume(db):
         raise click.ClickException(
             f"Volume {db:+.1f} dB exceeds limit {DeviMoteBackEnd.VOLUME_LIMIT:+.1f} dB"
         )
-    backend = _connect()
-    backend.set_volume(db)
+    with _session() as backend:
+        backend.set_volume(db)
     click.echo(f"Volume set to {db:+.1f} dB")
 
 
 @main.command()
 def mute():
     '''Toggle mute on/off'''
-    backend = _connect()
-    backend.toggle_mute()
+    with _session() as backend:
+        backend.toggle_mute()
     click.echo('Mute toggled')
 
 
 @main.command()
 def power():
     '''Toggle power (on/standby)'''
-    backend = _connect()
-    backend.toggle_power()
+    with _session() as backend:
+        backend.toggle_power()
     click.echo('Power toggled')
 
 
@@ -91,15 +135,15 @@ def power():
 @click.argument('name')
 def source(name):
     '''Select input source by name (case-insensitive partial match)'''
-    backend = _connect()
-    ch_list = backend.status['ch_list']
-    matches = {idx: n for idx, n in ch_list.items() if name.lower() in n.lower()}
-    if not matches:
-        available = ', '.join(n.strip() for n in ch_list.values())
-        raise click.ClickException(f"No source matching '{name}'. Available: {available}")
-    if len(matches) > 1:
-        found = ', '.join(f"{n.strip()} ({i})" for i, n in sorted(matches.items()))
-        raise click.ClickException(f"Ambiguous source '{name}', matches: {found}")
-    idx, n = next(iter(matches.items()))
-    backend.set_output(idx)
+    with _session() as backend:
+        ch_list = backend.status['ch_list']
+        matches = {idx: n for idx, n in ch_list.items() if name.lower() in n.lower()}
+        if not matches:
+            available = ', '.join(n.strip() for n in ch_list.values())
+            raise click.ClickException(f"No source matching '{name}'. Available: {available}")
+        if len(matches) > 1:
+            found = ', '.join(f"{n.strip()} ({i})" for i, n in sorted(matches.items()))
+            raise click.ClickException(f"Ambiguous source '{name}', matches: {found}")
+        idx, n = next(iter(matches.items()))
+        backend.set_output(idx)
     click.echo(f"Source set to {n.strip()}")

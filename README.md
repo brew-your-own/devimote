@@ -89,6 +89,21 @@ devialet power
 devialet source analog
 ```
 
+### Session state
+
+Each `devialet` invocation is a fresh process, but the amplifier tracks a command
+sequence counter across commands. To keep that counter continuous between
+invocations (and avoid commands being silently ignored as stale duplicates), the CLI
+persists it to a small per-amplifier-IP JSON file:
+
+- **macOS**: `~/Library/Application Support/pydevialet-expert-nonpro/state.json`
+- **Linux**: `$XDG_CONFIG_HOME/pydevialet-expert-nonpro/state.json` (defaults to
+  `~/.config/pydevialet-expert-nonpro/state.json`)
+- **Windows**: `%APPDATA%\pydevialet-expert-nonpro\state.json`
+
+The path (and current counter) is also shown by `devialet status`. It's safe to delete
+this file at any time; it will be recreated starting from 0 on the next command.
+
 ## GUI
 
 The Kivy GUI is a standalone script. Install the project with the `gui` extra and run it:
